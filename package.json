@@ -9,7 +9,10 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "tsc"
+		"build": "tsc",
+		"typecheck": "tsc --noEmit",
+		"lint": "echo \"No linting configured.\"",
+		"test": "echo \"No tests configured.\""
 	},
 	"dependencies": {
 		"n8n-workflow": "^1.0.0"

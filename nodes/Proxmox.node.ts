@@ -5,6 +5,7 @@ import type {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	JsonObject,
 } from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
 
@@ -84,7 +85,7 @@ export class Proxmox implements INodeType {
 				try {
 					guestType = this.getNodeParameter('guestType', 0) as string;
 				} catch (error) {
-					throw new NodeApiError(this.getNode(), error as Error, {
+					throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
 						message: 'Select a guest type before choosing a VMID.',
 					});
 				}
@@ -92,19 +93,19 @@ export class Proxmox implements INodeType {
 				try {
 					nodeName = this.getNodeParameter('nodeName', 0) as string;
 				} catch (error) {
-					throw new NodeApiError(this.getNode(), error as Error, {
+					throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
 						message: 'Select a node before choosing a VMID.',
 					});
 				}
 
 				if (!guestType) {
-					throw new NodeApiError(this.getNode(), new Error('Guest type is required.'), {
+					throw new NodeApiError(this.getNode(), new Error('Guest type is required.') as unknown as JsonObject, {
 						message: 'Select a guest type before choosing a VMID.',
 					});
 				}
 
 				if (!nodeName) {
-					throw new NodeApiError(this.getNode(), new Error('Node name is required.'), {
+					throw new NodeApiError(this.getNode(), new Error('Node name is required.') as unknown as JsonObject, {
 						message: 'Select a node before choosing a VMID.',
 					});
 				}
@@ -126,13 +127,13 @@ export class Proxmox implements INodeType {
 				try {
 					nodeName = this.getNodeParameter('nodeName', 0) as string;
 				} catch (error) {
-					throw new NodeApiError(this.getNode(), error as Error, {
+					throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
 						message: 'Select a node before choosing a storage ID.',
 					});
 				}
 
 				if (!nodeName) {
-					throw new NodeApiError(this.getNode(), new Error('Node name is required.'), {
+					throw new NodeApiError(this.getNode(), new Error('Node name is required.') as unknown as JsonObject, {
 						message: 'Select a node before choosing a storage ID.',
 					});
 				}

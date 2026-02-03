@@ -1,19 +1,21 @@
-import type {
-	IExecuteFunctions,
-	ILoadOptionsFunctions,
-	INodeExecutionData,
-	INodeType,
-	INodeTypeDescription,
-} from 'n8n-workflow';
+import type { IExecuteFunctions, ILoadOptionsFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
 export declare class Proxmox implements INodeType {
-	description: INodeTypeDescription;
-	methods: {
-		loadOptions: {
-			getNodeOptions(this: ILoadOptionsFunctions): Promise<{
-				name: string;
-				value: string;
-			}[]>;
-		};
-	};
-	execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]>;
+    description: INodeTypeDescription;
+    methods: {
+        loadOptions: {
+            getNodeOptions(this: ILoadOptionsFunctions): Promise<{
+                name: string;
+                value: string;
+            }[]>;
+            getGuestOptions(this: ILoadOptionsFunctions): Promise<{
+                name: string;
+                value: number;
+            }[]>;
+            getStorageOptions(this: ILoadOptionsFunctions): Promise<{
+                name: string;
+                value: string;
+            }[]>;
+        };
+    };
+    execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]>;
 }

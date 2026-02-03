@@ -183,3 +183,8 @@ npm run build
 ```
 
 The compiled output is published from `dist/`.
+
+## 📚 References
+
+- Proxmox VE API Viewer: https://pve.proxmox.com/pve-docs/api-viewer/index.html
+- n8n Custom Node documentation: https://docs.n8n.io/integrations/creating-nodes/
