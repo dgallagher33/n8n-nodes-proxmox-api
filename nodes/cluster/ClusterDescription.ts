@@ -26,6 +26,16 @@ export const clusterOperations: INodeProperties[] = [
 				value: 'getResources',
 				description: 'List resources across the cluster',
 			},
+			{
+				name: 'Get Tasks',
+				value: 'getTasks',
+				description: 'List recent cluster tasks',
+			},
+			{
+				name: 'Get HA Status',
+				value: 'getHaStatus',
+				description: 'Get current HA status information',
+			},
 		],
 		default: 'getVersion',
 	},

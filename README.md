@@ -30,18 +30,32 @@ In n8n credentials:
 - Enable **Allow Self-signed Certificates** only if your Proxmox instance uses self-signed certs.
 - TLS verification is never disabled globally.
 
-## ✅ Supported operations (MVP)
+## ✅ Supported operations (read-only)
 
 ### Cluster
 
 - **Get Version** → `/version`
 - **Get Nodes** → `/nodes`
 - **Get Resources** → `/cluster/resources`
+- **Get Tasks** → `/cluster/tasks`
+- **Get HA Status** → `/cluster/ha/status/current`
 
 ### Node
 
 - **List VMs & Containers** → `/nodes/{node}/qemu` and `/nodes/{node}/lxc`
 - **Get Node Status** → `/nodes/{node}/status`
+- **Get Node Config** → `/nodes/{node}/config`
+
+### Guest
+
+- **Get Config** → `/nodes/{node}/qemu/{vmid}/config` and `/nodes/{node}/lxc/{vmid}/config`
+- **Get Status** → `/nodes/{node}/qemu/{vmid}/status/current` and `/nodes/{node}/lxc/{vmid}/status/current`
+- **List Snapshots** → `/nodes/{node}/qemu/{vmid}/snapshot` and `/nodes/{node}/lxc/{vmid}/snapshot`
+
+### Storage
+
+- **Get Status** → `/nodes/{node}/storage/{storage}/status`
+- **Get RRD Data** → `/nodes/{node}/storage/{storage}/rrddata`
 
 ## 🧪 Curl equivalents
 
@@ -68,6 +82,20 @@ curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
   https://pve1.example.com:8006/api2/json/cluster/resources
 ```
 
+### Cluster → Get Tasks
+
+```bash
+curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
+  https://pve1.example.com:8006/api2/json/cluster/tasks
+```
+
+### Cluster → Get HA Status
+
+```bash
+curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
+  https://pve1.example.com:8006/api2/json/cluster/ha/status/current
+```
+
 ### Node → List VMs & Containers
 
 ```bash
@@ -83,6 +111,48 @@ curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
 ```bash
 curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
   https://pve1.example.com:8006/api2/json/nodes/pve1/status
+```
+
+### Node → Get Node Config
+
+```bash
+curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
+  https://pve1.example.com:8006/api2/json/nodes/pve1/config
+```
+
+### Guest → Get Config (QEMU)
+
+```bash
+curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
+  https://pve1.example.com:8006/api2/json/nodes/pve1/qemu/100/config
+```
+
+### Guest → Get Status (LXC)
+
+```bash
+curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
+  https://pve1.example.com:8006/api2/json/nodes/pve1/lxc/101/status/current
+```
+
+### Guest → List Snapshots (QEMU)
+
+```bash
+curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
+  https://pve1.example.com:8006/api2/json/nodes/pve1/qemu/100/snapshot
+```
+
+### Storage → Get Status
+
+```bash
+curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
+  https://pve1.example.com:8006/api2/json/nodes/pve1/storage/local/status
+```
+
+### Storage → Get RRD Data
+
+```bash
+curl -k -H "Authorization: PVEAPIToken=user@pve!token=secret" \
+  "https://pve1.example.com:8006/api2/json/nodes/pve1/storage/local/rrddata?timeframe=hour&cf=AVERAGE"
 ```
 
 ### Reverse proxy example

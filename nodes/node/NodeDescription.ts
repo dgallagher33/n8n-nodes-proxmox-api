@@ -21,6 +21,11 @@ export const nodeOperations: INodeProperties[] = [
 				value: 'getStatus',
 				description: 'Get status information for a node',
 			},
+			{
+				name: 'Get Node Config',
+				value: 'getConfig',
+				description: 'Get configuration for a node',
+			},
 		],
 		default: 'listGuests',
 	},
