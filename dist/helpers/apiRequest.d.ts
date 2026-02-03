@@ -1,8 +1,8 @@
-import type { IExecuteFunctions, ILoadOptionsFunctions } from 'n8n-workflow';
+import type { IDataObject, IExecuteFunctions, IHttpRequestMethods, ILoadOptionsFunctions } from 'n8n-workflow';
 export declare function proxmoxApiRequest(
 	this: IExecuteFunctions | ILoadOptionsFunctions,
-	method: string,
+	method: IHttpRequestMethods,
 	endpoint: string,
-	body?: Record<string, unknown> | undefined,
-	qs?: Record<string, unknown> | undefined,
+	body?: IDataObject | undefined,
+	qs?: IDataObject | undefined,
 ): Promise<unknown>;

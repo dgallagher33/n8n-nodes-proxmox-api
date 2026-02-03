@@ -46,9 +46,10 @@ async function proxmoxApiRequest(method, endpoint, body = undefined, qs = undefi
 		});
 		return response?.data ?? response;
 	} catch (error) {
-		const statusCode = error?.statusCode ?? error?.response?.statusCode;
-		const errorBody = error?.response?.body;
-		let message = error?.message ?? 'Proxmox API request failed';
+		const errorContext = error;
+		const statusCode = errorContext.statusCode ?? errorContext.response?.statusCode;
+		const errorBody = errorContext.response?.body;
+		let message = errorContext.message ?? 'Proxmox API request failed';
 		if (errorBody?.message) {
 			message = errorBody.message;
 		} else if (errorBody?.errors) {

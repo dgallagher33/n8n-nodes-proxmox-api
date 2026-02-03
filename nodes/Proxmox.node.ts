@@ -1,5 +1,6 @@
 import type {
 	IExecuteFunctions,
+	IDataObject,
 	ILoadOptionsFunctions,
 	INodeExecutionData,
 	INodeType,
@@ -76,17 +77,21 @@ export class Proxmox implements INodeType {
 
 			if (resource === 'cluster') {
 				if (operation === 'getVersion') {
-					const data = await proxmoxApiRequest.call(this, 'GET', '/version');
-					returnData.push({ json: data as Record<string, unknown> });
+					const data = (await proxmoxApiRequest.call(this, 'GET', '/version')) as IDataObject;
+					returnData.push({ json: data });
 				}
 
 				if (operation === 'getNodes') {
-					const data = await proxmoxApiRequest.call(this, 'GET', '/nodes');
+					const data = (await proxmoxApiRequest.call(this, 'GET', '/nodes')) as IDataObject[];
 					returnData.push({ json: { nodes: data } });
 				}
 
 				if (operation === 'getResources') {
-					const data = await proxmoxApiRequest.call(this, 'GET', '/cluster/resources');
+					const data = (await proxmoxApiRequest.call(
+						this,
+						'GET',
+						'/cluster/resources',
+					)) as IDataObject[];
 					returnData.push({ json: { resources: data } });
 				}
 			}
@@ -98,7 +103,7 @@ export class Proxmox implements INodeType {
 					const [qemu, lxc] = (await Promise.all([
 						proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/qemu`),
 						proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/lxc`),
-					])) as [unknown[], unknown[]];
+					])) as [IDataObject[], IDataObject[]];
 
 					returnData.push({
 						json: {
@@ -109,12 +114,12 @@ export class Proxmox implements INodeType {
 				}
 
 				if (operation === 'getStatus') {
-					const data = await proxmoxApiRequest.call(
+					const data = (await proxmoxApiRequest.call(
 						this,
 						'GET',
 						`/nodes/${nodeName}/status`,
-					);
-					returnData.push({ json: data as Record<string, unknown> });
+					)) as IDataObject;
+					returnData.push({ json: data });
 				}
 			}
 		}

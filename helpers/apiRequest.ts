@@ -1,6 +1,11 @@
-import type { IExecuteFunctions, ILoadOptionsFunctions } from 'n8n-workflow';
+import type {
+	IDataObject,
+	IExecuteFunctions,
+	IHttpRequestMethods,
+	ILoadOptionsFunctions,
+} from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
-import https from 'https';
+import * as https from 'https';
 
 interface ProxmoxCredentials {
 	baseUrl: string;
@@ -27,10 +32,10 @@ function buildAuthorizationHeader(tokenId: string, tokenSecret: string): string 
 
 export async function proxmoxApiRequest(
 	this: IExecuteFunctions | ILoadOptionsFunctions,
-	method: string,
+	method: IHttpRequestMethods,
 	endpoint: string,
-	body: Record<string, unknown> | undefined = undefined,
-	qs: Record<string, unknown> | undefined = undefined,
+	body: IDataObject | undefined = undefined,
+	qs: IDataObject | undefined = undefined,
 ): Promise<unknown> {
 	const credentials = await this.getCredentials<ProxmoxCredentials>('proxmoxApi');
 	const baseUrl = normalizeBaseUrl(credentials.baseUrl);
@@ -64,9 +69,14 @@ export async function proxmoxApiRequest(
 
 		return response?.data ?? response;
 	} catch (error) {
-		const statusCode = error?.statusCode ?? error?.response?.statusCode;
-		const errorBody = error?.response?.body;
-		let message = error?.message ?? 'Proxmox API request failed';
+		const errorContext = error as {
+			statusCode?: number;
+			response?: { statusCode?: number; body?: { message?: string; errors?: unknown } };
+			message?: string;
+		};
+		const statusCode = errorContext.statusCode ?? errorContext.response?.statusCode;
+		const errorBody = errorContext.response?.body;
+		let message = errorContext.message ?? 'Proxmox API request failed';
 
 		if (errorBody?.message) {
 			message = errorBody.message;
@@ -74,7 +84,7 @@ export async function proxmoxApiRequest(
 			message = JSON.stringify(errorBody.errors);
 		}
 
-		throw new NodeApiError(this.getNode(), error, {
+		throw new NodeApiError(this.getNode(), error as IDataObject, {
 			message,
 			description: statusCode ? `HTTP status code: ${statusCode}` : undefined,
 		});
