@@ -30,20 +30,21 @@ async function proxmoxApiRequest(method, endpoint, body = undefined, qs = undefi
 		});
 	}
 	try {
-		const response = await this.helpers.request({
+		const requestOptions = {
 			method,
 			uri,
 			body,
 			qs,
 			json: true,
-			agent,
 			headers: {
 				Authorization: buildAuthorizationHeader(
 					credentials.apiTokenId,
 					credentials.apiTokenSecret,
 				),
 			},
-		});
+		};
+		requestOptions.agent = agent;
+		const response = await this.helpers.request(requestOptions);
 		return response?.data ?? response;
 	} catch (error) {
 		const errorContext = error;

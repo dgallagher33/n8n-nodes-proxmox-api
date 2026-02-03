@@ -3,9 +3,10 @@ import type {
 	IExecuteFunctions,
 	IHttpRequestMethods,
 	ILoadOptionsFunctions,
+	JsonObject,
 } from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
-import * as https from 'https';
+import { Agent } from 'https';
 
 interface ProxmoxCredentials {
 	baseUrl: string;
@@ -40,7 +41,7 @@ export async function proxmoxApiRequest(
 	const credentials = await this.getCredentials<ProxmoxCredentials>('proxmoxApi');
 	const baseUrl = normalizeBaseUrl(credentials.baseUrl);
 	const uri = `${baseUrl}${ensureLeadingSlash(endpoint)}`;
-	const agent = new https.Agent({
+	const agent = new Agent({
 		rejectUnauthorized: !credentials.allowSelfSignedCerts,
 	});
 
@@ -52,20 +53,21 @@ export async function proxmoxApiRequest(
 	}
 
 	try {
-		const response = await this.helpers.request({
+		const requestOptions: IDataObject = {
 			method,
 			uri,
 			body,
 			qs,
 			json: true,
-			agent,
 			headers: {
 				Authorization: buildAuthorizationHeader(
 					credentials.apiTokenId,
 					credentials.apiTokenSecret,
 				),
 			},
-		});
+		};
+		(requestOptions as { agent?: Agent }).agent = agent;
+		const response = await this.helpers.request(requestOptions as JsonObject);
 
 		return response?.data ?? response;
 	} catch (error) {
@@ -84,7 +86,7 @@ export async function proxmoxApiRequest(
 			message = JSON.stringify(errorBody.errors);
 		}
 
-		throw new NodeApiError(this.getNode(), error as IDataObject, {
+		throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
 			message,
 			description: statusCode ? `HTTP status code: ${statusCode}` : undefined,
 		});
