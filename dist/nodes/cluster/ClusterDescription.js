@@ -1,0 +1,33 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.clusterOperations = void 0;
+exports.clusterOperations = [
+	{
+		displayName: 'Operation',
+		name: 'operation',
+		type: 'options',
+		displayOptions: {
+			show: {
+				resource: ['cluster'],
+			},
+		},
+		options: [
+			{
+				name: 'Get Version',
+				value: 'getVersion',
+				description: 'Get the Proxmox API version',
+			},
+			{
+				name: 'Get Nodes',
+				value: 'getNodes',
+				description: 'List nodes in the cluster',
+			},
+			{
+				name: 'Get Resources',
+				value: 'getResources',
+				description: 'List resources across the cluster',
+			},
+		],
+		default: 'getVersion',
+	},
+];
