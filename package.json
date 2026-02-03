@@ -1,0 +1,28 @@
+{
+	"name": "n8n-nodes-proxmox-api",
+	"version": "0.1.0",
+	"description": "n8n community node for Proxmox VE API",
+	"license": "MIT",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc"
+	},
+	"dependencies": {
+		"n8n-workflow": "^1.0.0"
+	},
+	"devDependencies": {
+		"typescript": "^5.4.5"
+	},
+	"n8n": {
+		"credentials": [
+			"dist/credentials/ProxmoxApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Proxmox.node.js"
+		]
+	}
+}
