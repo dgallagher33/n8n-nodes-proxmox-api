@@ -11,8 +11,8 @@
 	"scripts": {
 		"build": "tsc",
 		"typecheck": "tsc --noEmit",
-		"lint": "echo \"No linting configured.\"",
-		"test": "node tests/loadOptions.test.js"
+		"lint": "echo \"No lint configured\"",
+		"test": "node --test test/**/*.test.js"
 	},
 	"dependencies": {
 		"n8n-workflow": "^1.0.0"

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Proxmox = void 0;
 const n8n_workflow_1 = require("n8n-workflow");
 const apiRequest_1 = require("../helpers/apiRequest");
+const lxc_1 = require("../helpers/lxc");
 const ClusterDescription_1 = require("./cluster/ClusterDescription");
 const GuestDescription_1 = require("./guest/GuestDescription");
 const NodeDescription_1 = require("./node/NodeDescription");
@@ -38,24 +39,14 @@ class Proxmox {
                             value: 'cluster',
                         },
                         {
-                            name: 'Guest',
-                            value: 'guest',
-                        },
-                        {
                             name: 'Node',
                             value: 'node',
-                        },
-                        {
-                            name: 'Storage',
-                            value: 'storage',
                         },
                     ],
                     default: 'cluster',
                 },
                 ...ClusterDescription_1.clusterOperations,
-                ...GuestDescription_1.guestOperations,
                 ...NodeDescription_1.nodeOperations,
-                ...StorageDescription_1.storageOperations,
             ],
         };
         this.methods = {
@@ -67,61 +58,13 @@ class Proxmox {
                         value: node.node,
                     }));
                 },
-                async getGuestOptions() {
-                    let guestType;
-                    let nodeName;
-                    try {
-                        guestType = this.getCurrentNodeParameter('guestType');
-                    }
-                    catch (error) {
-                        throw new n8n_workflow_1.NodeApiError(this.getNode(), error, {
-                            message: 'Select a guest type before choosing a VMID.',
-                        });
-                    }
-                    try {
-                        nodeName = this.getCurrentNodeParameter('nodeName');
-                    }
-                    catch (error) {
-                        throw new n8n_workflow_1.NodeApiError(this.getNode(), error, {
-                            message: 'Select a node before choosing a VMID.',
-                        });
-                    }
-                    if (!guestType) {
-                        throw new n8n_workflow_1.NodeApiError(this.getNode(), new Error('Guest type is required.'), {
-                            message: 'Select a guest type before choosing a VMID.',
-                        });
-                    }
+                async getLxcVmidOptions() {
+                    const nodeName = this.getCurrentNodeParameter('nodeName');
                     if (!nodeName) {
-                        throw new n8n_workflow_1.NodeApiError(this.getNode(), new Error('Node name is required.'), {
-                            message: 'Select a node before choosing a VMID.',
-                        });
+                        return [];
                     }
-                    const guests = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/${guestType}`));
-                    return guests.map((guest) => ({
-                        name: guest.name ? `${guest.name} (${guest.vmid})` : String(guest.vmid),
-                        value: guest.vmid,
-                    }));
-                },
-                async getStorageOptions() {
-                    let nodeName;
-                    try {
-                        nodeName = this.getCurrentNodeParameter('nodeName');
-                    }
-                    catch (error) {
-                        throw new n8n_workflow_1.NodeApiError(this.getNode(), error, {
-                            message: 'Select a node before choosing a storage ID.',
-                        });
-                    }
-                    if (!nodeName) {
-                        throw new n8n_workflow_1.NodeApiError(this.getNode(), new Error('Node name is required.'), {
-                            message: 'Select a node before choosing a storage ID.',
-                        });
-                    }
-                    const storages = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/storage`));
-                    return storages.map((storage) => ({
-                        name: storage.type ? `${storage.storage} (${storage.type})` : storage.storage,
-                        value: storage.storage,
-                    }));
+                    const lxcs = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/lxc`));
+                    return (0, lxc_1.buildLxcVmidOptions)(lxcs);
                 },
             },
         };
@@ -145,36 +88,6 @@ class Proxmox {
                     const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', '/cluster/resources'));
                     returnData.push({ json: { resources: data } });
                 }
-                if (operation === 'getTasks') {
-                    const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', '/cluster/tasks'));
-                    returnData.push({ json: { tasks: data } });
-                }
-                if (operation === 'getHaStatus') {
-                    const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', '/cluster/ha/status/current'));
-                    returnData.push({ json: data });
-                }
-            }
-            if (resource === 'guest') {
-                const guestType = this.getNodeParameter('guestType', itemIndex);
-                const nodeName = this.getNodeParameter('nodeName', itemIndex);
-                const vmid = String(this.getNodeParameter('vmid', itemIndex));
-                const basePath = `/nodes/${nodeName}/${guestType}/${vmid}`;
-                if (operation === 'getConfig') {
-                    const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `${basePath}/config`));
-                    returnData.push({ json: data });
-                }
-                if (operation === 'getStatus') {
-                    const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `${basePath}/status/current`));
-                    returnData.push({ json: data });
-                }
-                if (operation === 'listSnapshots') {
-                    const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `${basePath}/snapshot`));
-                    const snapshotName = this.getNodeParameter('snapshotName', itemIndex, '');
-                    const snapshots = snapshotName
-                        ? data.filter((snapshot) => snapshot.name === snapshotName)
-                        : data;
-                    returnData.push({ json: { snapshots } });
-                }
             }
             if (resource === 'node') {
                 const nodeName = this.getNodeParameter('nodeName', itemIndex);
@@ -194,30 +107,10 @@ class Proxmox {
                     const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/status`));
                     returnData.push({ json: data });
                 }
-                if (operation === 'getConfig') {
-                    const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/config`));
+                if (operation === 'getLxcStatus') {
+                    const vmid = this.getNodeParameter('vmid', itemIndex);
+                    const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/lxc/${vmid}/status/current`));
                     returnData.push({ json: data });
-                }
-            }
-            if (resource === 'storage') {
-                const nodeName = this.getNodeParameter('nodeName', itemIndex);
-                const storageId = this.getNodeParameter('storageId', itemIndex);
-                if (operation === 'getStatus') {
-                    const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/storage/${storageId}/status`));
-                    returnData.push({ json: { status: data } });
-                }
-                if (operation === 'getRrdData') {
-                    const timeframe = this.getNodeParameter('timeframe', itemIndex, '');
-                    const cf = this.getNodeParameter('cf', itemIndex, '');
-                    const qs = {};
-                    if (timeframe) {
-                        qs.timeframe = timeframe;
-                    }
-                    if (cf) {
-                        qs.cf = cf;
-                    }
-                    const data = (await apiRequest_1.proxmoxApiRequest.call(this, 'GET', `/nodes/${nodeName}/storage/${storageId}/rrddata`, undefined, Object.keys(qs).length ? qs : undefined));
-                    returnData.push({ json: { rrddata: data } });
                 }
             }
         }

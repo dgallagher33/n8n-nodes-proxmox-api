@@ -7,14 +7,7 @@ export declare class Proxmox implements INodeType {
                 name: string;
                 value: string;
             }[]>;
-            getGuestOptions(this: ILoadOptionsFunctions): Promise<{
-                name: string;
-                value: number;
-            }[]>;
-            getStorageOptions(this: ILoadOptionsFunctions): Promise<{
-                name: string;
-                value: string;
-            }[]>;
+            getLxcVmidOptions(this: ILoadOptionsFunctions): Promise<import("../helpers/lxc").LxcOption[]>;
         };
     };
     execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]>;
