@@ -83,7 +83,7 @@ export class Proxmox implements INodeType {
 				let nodeName: string | undefined;
 
 				try {
-					guestType = this.getNodeParameter('guestType', 0) as string;
+					guestType = this.getCurrentNodeParameter('guestType') as string;
 				} catch (error) {
 					throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
 						message: 'Select a guest type before choosing a VMID.',
@@ -91,7 +91,7 @@ export class Proxmox implements INodeType {
 				}
 
 				try {
-					nodeName = this.getNodeParameter('nodeName', 0) as string;
+					nodeName = this.getCurrentNodeParameter('nodeName') as string;
 				} catch (error) {
 					throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
 						message: 'Select a node before choosing a VMID.',
@@ -125,7 +125,7 @@ export class Proxmox implements INodeType {
 				let nodeName: string | undefined;
 
 				try {
-					nodeName = this.getNodeParameter('nodeName', 0) as string;
+					nodeName = this.getCurrentNodeParameter('nodeName') as string;
 				} catch (error) {
 					throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
 						message: 'Select a node before choosing a storage ID.',

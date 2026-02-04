@@ -12,7 +12,7 @@
 		"build": "tsc",
 		"typecheck": "tsc --noEmit",
 		"lint": "echo \"No linting configured.\"",
-		"test": "echo \"No tests configured.\""
+		"test": "node tests/loadOptions.test.js"
 	},
 	"dependencies": {
 		"n8n-workflow": "^1.0.0"

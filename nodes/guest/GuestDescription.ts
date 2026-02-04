@@ -74,6 +74,7 @@ export const guestOperations: INodeProperties[] = [
 		required: true,
 		typeOptions: {
 			loadOptionsMethod: 'getGuestOptions',
+			loadOptionsDependsOn: ['guestType', 'nodeName'],
 		},
 		displayOptions: {
 			show: {

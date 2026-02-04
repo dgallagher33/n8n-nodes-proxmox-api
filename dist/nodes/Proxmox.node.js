@@ -71,7 +71,7 @@ class Proxmox {
                     let guestType;
                     let nodeName;
                     try {
-                        guestType = this.getNodeParameter('guestType', 0);
+                        guestType = this.getCurrentNodeParameter('guestType');
                     }
                     catch (error) {
                         throw new n8n_workflow_1.NodeApiError(this.getNode(), error, {
@@ -79,7 +79,7 @@ class Proxmox {
                         });
                     }
                     try {
-                        nodeName = this.getNodeParameter('nodeName', 0);
+                        nodeName = this.getCurrentNodeParameter('nodeName');
                     }
                     catch (error) {
                         throw new n8n_workflow_1.NodeApiError(this.getNode(), error, {
@@ -105,7 +105,7 @@ class Proxmox {
                 async getStorageOptions() {
                     let nodeName;
                     try {
-                        nodeName = this.getNodeParameter('nodeName', 0);
+                        nodeName = this.getCurrentNodeParameter('nodeName');
                     }
                     catch (error) {
                         throw new n8n_workflow_1.NodeApiError(this.getNode(), error, {
